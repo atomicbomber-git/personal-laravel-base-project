@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\User;
@@ -15,14 +16,14 @@ class LoginControllerTest extends TestCase
     {
         $password = 'password';
         $userData = factory(User::class)
-            ->create(['password' => $password]);
+            ->create(['password' => Hash::make($password)]);
 
         $response = $this->post(route('login'), [
             'username' => $userData->username,
             'password' => $password
         ]);
         
-        // Succesful logins return in a redirect
-        $response->assertStatus(302);
+        $response->assertSessionHasNoErrors();
+        $response->assertRedirect(route('home'));
     }
 }
